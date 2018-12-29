@@ -24,7 +24,7 @@ async function createEmbed(userObj: {user: UserResponse, chatId: string, _id: st
   } else {
     let instanceTag = 'public'
     if (user.worldId === 'private') {
-      instanceTag = 'private'
+      embed.setDescription(`Status: Private`)
     } else {
       const worldInfo = await api.world.getById(user.worldId)
       console.log(worldInfo)
@@ -39,10 +39,10 @@ async function createEmbed(userObj: {user: UserResponse, chatId: string, _id: st
             break
         }
       }
+      embed.setDescription(`Status: ${user.status}/${user.statusDescription}`)
+        .setTitle(`${worldInfo.name} - ${instanceTag}`)
+        .setThumbnail(worldInfo.imageUrl)
     }
-    embed.setDescription(`Status: ${user.status}/${user.statusDescription}`)
-      .setTitle(`${worldInfo.name} - ${instanceTag}`)
-      .setThumbnail(worldInfo.imageUrl)
   }
   return {embed: embed, chatId: userObj.chatId, _id: userObj._id}
 }
