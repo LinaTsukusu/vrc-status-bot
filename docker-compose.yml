@@ -3,13 +3,13 @@ services:
   vrc-status-bot:
     image: node:11.6.0
     environment:
-      - TOKEN: BOT_TOKEN
-      - VRC_USERNAME: USERNAME
-      - VRC_PASSWORD: PASSWORD
-      - GUILD_ID: GUILD
-      - CHANNEL_ID: CHANNEL
+      TOKEN: BOT_TOKEN
+      VRC_USERNAME: USERNAME
+      VRC_PASSWORD: PASSWORD
+      GUILD_ID: GUILD
+      CHANNEL_ID: CHANNEL
     volumes:
-      - ./dist:/app
+      - .:/app
       - ./db:/db
     working_dir: /app
-    entrypoint: "npm start"
+    entrypoint: bash -c "npm install && npm start"
