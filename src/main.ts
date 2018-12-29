@@ -63,7 +63,7 @@ async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
           filename: '/db/users.db',
           autoload: true,
         })
-        db.update({_id: v._id}, {chatId: mes.id})
+        db.update({_id: v._id}, {$set: {chatId: mes.id}})
       }
     }
   })
