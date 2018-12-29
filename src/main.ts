@@ -129,7 +129,7 @@ async function removeUser(message: Message) {
     filename: '/db/users.db',
     autoload: true,
   })
-  db.deleteOne({discordId: discordId})
+  db.remove({discordId: discordId})
   channel.send(`<@${discordId}> 登録を消したで`)
 }
 
