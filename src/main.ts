@@ -5,17 +5,17 @@ import VrcApi from 'vrchat-client/dist/vrc-api'
 import {UserResponse} from 'vrchat-client/dist/types/user'
 
 
-async function fetchStatus(api: VrcApi): Promise<UserResponse[]> {
+async function fetchStatus(api: VrcApi): Promise<any> {
   const db = datastore({
     filename: '/db/users.db',
     autoload: true,
   })
 
-  const userIds: {vrchatId: string}[] = await db.find({})
-  return await Promise.all(userIds.map(v => api.user.getById(v.vrchatId)))
+  const users = await db.find({})
+  return await Promise.all(users.map(async v => {return {user: await api.user.getById(v.vrchatId), chat: v.chatId}}))
 }
 
-async function createEmbed(user: UserResponse, api: VrcApi): Promise<RichEmbed> {
+async function createEmbed(user: UserResponse, chatId: string, api: VrcApi): Promise<{embed: RichEmbed, chatId: string}> {
   const embed = new RichEmbed()
     .setAuthor(user.displayName, user.currentAvatarThumbnailImageUrl, `https://vrchat.net/home/user/${user.id}`)
   if (user.location === 'offline') {
@@ -42,14 +42,17 @@ async function createEmbed(user: UserResponse, api: VrcApi): Promise<RichEmbed> 
       .setTitle(`${worldInfo.name} - ${instanceTag}`)
       .setThumbnail(worldInfo.imageUrl)
   }
-  return embed
+  return {embed: embed, chatId: chatId}
 }
 
-async function sendStatusMessage(api: VrcApi, channel: TextChannel): Promise<(Message | Message[])[]> {
+async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
   const users = await fetchStatus(api)
-  const embeds = await Promise.all(users.map(v => createEmbed(v, api)))
-  await channel.messages.deleteAll()
-  return await Promise.all(embeds.map(v => channel.send(v)))
+  console.log(users)
+  const embeds: any = await Promise.all(users.map(v => createEmbed(v.vrchatId, v.chatId, api)))
+  console.log(embeds)
+  // Promise.all(embeds.map(async v => {
+  //   channel.send(v.embed)
+  // }))
 }
 
 (async () => {
