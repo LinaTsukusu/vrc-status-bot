@@ -100,8 +100,8 @@ async function registerUser(message: Message, api: VrcApi) {
     filename: '/db/users.db',
     autoload: true,
   })
-  const checkId = await db.find({discordId: discordId})
-  if (checkId.length > 0) {
+  const checkId = await db.count({discordId: discordId})
+  if (checkId > 0) {
     channel.send("なんかもう登録されてるで｡消すときは`/remove [mention]`してな｡")
     return
   }
@@ -129,7 +129,7 @@ async function removeUser(message: Message) {
     filename: '/db/users.db',
     autoload: true,
   })
-  const data = await db.find({discordId: discordId})
+  const data = await db.findOne({discordId: discordId})
   db.remove({discordId: discordId})
   const mes: Message = await channel.fetchMessage(data.chatId)
   mes.delete()
