@@ -49,13 +49,13 @@ async function createEmbed(userObj: {user: UserResponse, chatId: string, _id: st
 
 async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
   const users = await fetchStatus(api)
-  console.log(users)
+  // console.log(users)
   const embeds = await Promise.all(users.map(v => createEmbed(v, api)))
-  console.log(embeds)
-  Promise.all(embeds.map(async v => {
+  // console.log(embeds)
+  embeds.map(async v => {
+    console.log(v.chatId)
     if (v.chatId) {
-      const mes: Message = await channel.fetchMessage(v.chatId)
-      mes.edit(v.embed)
+      channel.messages.get(v.chatId).edit(v.embed)
     } else {
       const mes = await channel.send(v.embed)
       if (mes instanceof Message) {
@@ -66,7 +66,7 @@ async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
         db.update({_id: v._id}, {chatId: mes.id})
       }
     }
-  }))
+  })
 }
 
 (async () => {
