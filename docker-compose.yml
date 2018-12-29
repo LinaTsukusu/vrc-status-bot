@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  vrc-status-bot:
+    image: node:11.6.0
+    environment:
+      - TOKEN: BOT_TOKEN
+      - VRC_USERNAME: USERNAME
+      - VRC_PASSWORD: PASSWORD
+      - GUILD_ID: GUILD
+      - CHANNEL_ID: CHANNEL
+    volumes:
+      - ./dist:/app
+      - ./db:/db
+    working_dir: /app
+    entrypoint: "npm start"

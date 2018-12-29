@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2018",
+    "outDir": "./dist",
+    "baseUrl": "./src"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
