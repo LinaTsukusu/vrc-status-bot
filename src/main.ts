@@ -5,17 +5,18 @@ import VrcApi from 'vrchat-client/dist/vrc-api'
 import {UserResponse} from 'vrchat-client/dist/types/user'
 
 
-async function fetchStatus(api: VrcApi): Promise<{user: UserResponse, chatId: string}[]> {
+async function fetchStatus(api: VrcApi): Promise<{user: UserResponse, chatId: string, _id: string}[]> {
   const db = datastore({
     filename: '/db/users.db',
     autoload: true,
   })
 
-  const users: {vrchatId: string, chatId: string}[] = await db.find({})
-  return await Promise.all(users.map(async v => {return {user: await api.user.getById(v.vrchatId), chatId: v.chatId}}))
+  const users: {vrchatId: string, chatId: string, _id: string}[] = await db.find({})
+  return await Promise.all(users.map(async v => {return {user: await api.user.getById(v.vrchatId), chatId: v.chatId, _id: v._id}}))
 }
 
-async function createEmbed(user: UserResponse, chatId: string, api: VrcApi): Promise<{embed: RichEmbed, chatId: string}> {
+async function createEmbed(userObj: {user: UserResponse, chatId: string, _id: string}, api: VrcApi): Promise<{embed: RichEmbed, chatId: string, _id: string}> {
+  const user = userObj.user
   const embed = new RichEmbed()
     .setAuthor(user.displayName, user.currentAvatarThumbnailImageUrl, `https://vrchat.net/home/user/${user.id}`)
   if (user.location === 'offline') {
@@ -42,17 +43,29 @@ async function createEmbed(user: UserResponse, chatId: string, api: VrcApi): Pro
       .setTitle(`${worldInfo.name} - ${instanceTag}`)
       .setThumbnail(worldInfo.imageUrl)
   }
-  return {embed: embed, chatId: chatId}
+  return {embed: embed, chatId: userObj.chatId, _id: userObj._id}
 }
 
 async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
   const users = await fetchStatus(api)
   console.log(users)
-  const embeds: any = await Promise.all(users.map(v => createEmbed(v.user, v.chatId, api)))
+  const embeds = await Promise.all(users.map(v => createEmbed(v, api)))
   console.log(embeds)
-  // Promise.all(embeds.map(async v => {
-  //   channel.send(v.embed)
-  // }))
+  Promise.all(embeds.map(async v => {
+    if (v.chatId) {
+      const mes: Message = await channel.fetchMessage(v.chatId)
+      mes.edit(v.embed)
+    } else {
+      const mes = await channel.send(v.embed)
+      if (mes instanceof Message) {
+        const db = datastore({
+          filename: '/db/users.db',
+          autoload: true,
+        })
+        db.update({_id: v._id}, {chatId: mes.id})
+      }
+    }
+  }))
 }
 
 (async () => {
