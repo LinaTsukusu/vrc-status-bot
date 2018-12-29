@@ -131,7 +131,7 @@ async function removeUser(message: Message) {
   })
   const data = await db.findOne({discordId: discordId})
   db.remove({discordId: discordId})
-  const mes: Message = await channel.fetchMessage(data.chatId)
+  const mes: Message = await (<TextChannel>message.guild.channels.get(process.env.CHANNEL_ID)).fetchMessage(data.chatId)
   mes.delete()
 
   channel.send(`<@${discordId}> 登録を消したで`)
