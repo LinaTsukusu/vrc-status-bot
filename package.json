@@ -13,10 +13,11 @@
   },
   "dependencies": {
     "discord.js": "^11.4.2",
-    "nedb": "^1.8.0",
+    "nedb-promise": "^2.0.1",
     "vrchat-client": "^0.2.3"
   },
   "devDependencies": {
+    "@types/nedb": "^1.8.6",
     "@types/node": "^10.12.18",
     "typescript": "^3.2.2"
   }

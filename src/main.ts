@@ -1,17 +1,18 @@
 import vrc from 'vrchat-client'
-import NeDB from 'nedb'
+import datastore from 'nedb-promise'
 import {Client, Message, RichEmbed, TextChannel} from 'discord.js'
 import VrcApi from 'vrchat-client/dist/vrc-api'
 import {UserResponse} from 'vrchat-client/dist/types/user'
 
 
 async function fetchStatus(api: VrcApi): Promise<UserResponse[]> {
-  const db = new NeDB({
+  const db = datastore({
     filename: '/db/users.db',
     autoload: true,
   })
-  const userIds: string[] = db.find({}, {"vrchatId": true}).map(v => v.vrchatId)
-  return await Promise.all(userIds.map(v => api.user.getById(v)))
+
+  const userIds: {vrchatId: string}[] = await db.find({}, {"vrchatId": true})
+  return await Promise.all(userIds.map(v => api.user.getById(v.vrchatId)))
 }
 
 async function createEmbed(user: UserResponse, api: VrcApi): Promise<RichEmbed> {
