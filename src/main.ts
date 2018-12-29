@@ -51,7 +51,8 @@ async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
   const embeds = await Promise.all(users.map(v => createEmbed(v, api)))
   embeds.map(async v => {
     if (v.chatId) {
-      channel.messages.get(v.chatId).edit(v.embed)
+      const mes = await channel.fetchMessage(v.chatId)
+      mes.edit(v.embed)
     } else {
       const mes = await channel.send(v.embed)
       if (mes instanceof Message) {
@@ -71,7 +72,8 @@ async function registerUser(message: Message) {
   if (message.author.bot || channel.id !== process.env.SETTING_CHANNEL_ID) {
     return
   }
-  console.log(message.mentions)
+  const discordId = message.mentions.users.first().id
+  console.log(message.content)
 }
 
 (async () => {
