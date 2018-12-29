@@ -150,7 +150,7 @@ async function removeUser(message: Message) {
   const api = await vrc.login(process.env.VRC_USERNAME, process.env.VRC_PASSWORD)
   setInterval(() => {
     sendStatusMessage(api, channel)
-  }, 5000)
+  }, Number(process.env.CYCLE) * 1000)
 
   client.on('message', message => registerUser(message, api))
   client.on('message', removeUser)

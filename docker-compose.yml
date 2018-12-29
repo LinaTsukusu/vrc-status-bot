@@ -9,6 +9,7 @@ services:
       GUILD_ID: GUILD
       CHANNEL_ID: CHANNEL
       SETTING_CHANNEL_ID: CHANNEL
+      CYCLE: 60
     volumes:
       - .:/app
       - ./db:/db
