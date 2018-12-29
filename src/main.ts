@@ -108,7 +108,7 @@ async function registerUser(message: Message, api: VrcApi) {
   db.insert({vrchatId: user.id, discordId: discordId})
   let data = await db.find({})
   data = data.filter(v => v.chatId)
-  db.update({}, {$set: {chatId: null}})
+  db.update({}, {$unset: {chatId: true}}, {multi: true})
   data.forEach(async v => {
     const mes = await (<TextChannel>message.guild.channels.get(process.env.CHANNEL_ID)).fetchMessage(v.chatId)
     mes.delete()
