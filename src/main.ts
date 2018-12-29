@@ -67,13 +67,70 @@ async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
 }
 
 
-async function registerUser(message: Message) {
+async function registerUser(message: Message, api: VrcApi) {
   const channel = message.channel
-  if (message.author.bot || channel.id !== process.env.SETTING_CHANNEL_ID) {
+  const command = message.content.split(" ")
+  if (message.author.bot || channel.id !== process.env.SETTING_CHANNEL_ID || command.shift() !== "/register") {
     return
   }
-  const discordId = message.mentions.users.first().id
-  console.log(message.content)
+  const mentionUsers = message.mentions.users
+  if (command.length == 1 && mentionUsers.size != 0 || command.length == 2 && mentionUsers.size != 1) {
+    channel.send('コマンド間違っとるで')
+  }
+
+  let discordId = message.author.id
+  if (message.mentions.users.size > 0) {
+    discordId = message.mentions.users.first().id
+    command.shift()
+  }
+
+  const vrc = command.shift()
+  let user: UserResponse = null
+  try {
+    user = await api.user.getById(vrc)
+  } catch (e) {
+    try {
+      user = await api.user.getByName(vrc)
+    } catch (e) {
+      channel.send('名前でもIDでもないっぽいぞ')
+    }
+  }
+
+  const db = datastore({
+    filename: '/db/users.db',
+    autoload: true,
+  })
+  const checkId = await db.find({discordId: discordId})
+  if (checkId.length > 0) {
+    channel.send("なんかもう登録されてるで｡消すときは`/remove [mention]`してな｡")
+    return
+  }
+  db.insert({vrchatId: user.id, discordId: discordId})
+  channel.send(`<@${discordId}> VRChat: ${user.username} (${user.id})を登録したぞ`)
+
+}
+
+async function removeUser(message: Message) {
+  const channel = message.channel
+  const command = message.content.split(" ")
+  if (message.author.bot || channel.id !== process.env.SETTING_CHANNEL_ID || command.shift() !== "/remove") {
+    return
+  }
+  const mentionUsers = message.mentions.users
+  if (command.length == 0 && mentionUsers.size != 0 || command.length == 1 && mentionUsers.size != 1) {
+    channel.send('コマンド間違っとるで')
+  }
+
+  let discordId = message.author.id
+  if (message.mentions.users.size > 0) {
+    discordId = message.mentions.users.first().id
+  }
+  const db = datastore({
+    filename: '/db/users.db',
+    autoload: true,
+  })
+  db.deleteOne({discordId: discordId})
+  channel.send(`<@${discordId}> 登録を消したで`)
 }
 
 (async () => {
@@ -85,6 +142,7 @@ async function registerUser(message: Message) {
     sendStatusMessage(api, channel)
   }, 5000)
 
-  client.on('message', registerUser)
+  client.on('message', message => registerUser(message, api))
+  client.on('message', removeUser)
 })()
 
