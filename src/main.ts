@@ -27,7 +27,6 @@ async function createEmbed(userObj: {user: UserResponse, chatId: string, _id: st
       embed.setDescription(`Status: Private`)
     } else {
       const worldInfo = await api.world.getById(user.worldId)
-      console.log(worldInfo)
       const instance = user.instanceId.split('~')
       if (instance.length === 3) {
         switch (instance[1].substring(0, instance[1].indexOf('('))) {
@@ -49,11 +48,8 @@ async function createEmbed(userObj: {user: UserResponse, chatId: string, _id: st
 
 async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
   const users = await fetchStatus(api)
-  // console.log(users)
   const embeds = await Promise.all(users.map(v => createEmbed(v, api)))
-  // console.log(embeds)
   embeds.map(async v => {
-    console.log(v.chatId)
     if (v.chatId) {
       channel.messages.get(v.chatId).edit(v.embed)
     } else {
@@ -69,6 +65,15 @@ async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
   })
 }
 
+
+async function registerUser(message: Message) {
+  const channel = message.channel
+  if (message.author.bot || channel.id !== process.env.SETTING_CHANNEL_ID) {
+    return
+  }
+  console.log(message.mentions)
+}
+
 (async () => {
   const client = new Client()
   await client.login(process.env.TOKEN)
@@ -77,5 +82,7 @@ async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
   setInterval(() => {
     sendStatusMessage(api, channel)
   }, 5000)
+
+  client.on('message', registerUser)
 })()
 

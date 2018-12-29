@@ -8,6 +8,7 @@ services:
       VRC_PASSWORD: PASSWORD
       GUILD_ID: GUILD
       CHANNEL_ID: CHANNEL
+      SETTING_CHANNEL_ID: CHANNEL
     volumes:
       - .:/app
       - ./db:/db
