@@ -109,9 +109,11 @@ async function registerUser(message: Message, api: VrcApi) {
   let data = await db.find({})
   data = data.filter(v => v.chatId)
   db.update({}, {$set: {chatId: null}})
-  data.forEach(async v => await (<TextChannel>message.guild.channels.get(process.env.CHANNEL_ID)).fetchMessage(v.chatId))
+  data.forEach(async v => {
+    const mes = await (<TextChannel>message.guild.channels.get(process.env.CHANNEL_ID)).fetchMessage(v.chatId)
+    mes.delete()
+  })
   channel.send(`<@${discordId}> VRChat: ${user.username} (${user.id})を登録したぞ`)
-
 }
 
 async function removeUser(message: Message) {
