@@ -12,4 +12,4 @@ services:
       - .:/app
       - ./db:/db
     working_dir: /app
-    entrypoint: bash -c "npm install && npm start"
+    entrypoint: bash -c "yarn && yarn start"
