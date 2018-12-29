@@ -22,21 +22,22 @@ async function createEmbed(userObj: {user: UserResponse, chatId: string, _id: st
   if (user.location === 'offline') {
     embed.setDescription(`Status: Offline`)
   } else {
-    const worldInfo = await api.world.getById(user.worldId)
-    console.log(worldInfo)
-    const instance = user.instanceId.split('~')
     let instanceTag = 'public'
-    if (instance.length === 3) {
-      switch (instance[1].substring(0, instance[1].indexOf('('))) {
-        case 'hidden':
-          instanceTag = 'friends+'
-          break
-        case 'friends':
-          instanceTag = 'friends'
-          break
-        case 'private':
-          instanceTag = 'private'
-          break
+    if (user.worldId === 'private') {
+      instanceTag = 'private'
+    } else {
+      const worldInfo = await api.world.getById(user.worldId)
+      console.log(worldInfo)
+      const instance = user.instanceId.split('~')
+      if (instance.length === 3) {
+        switch (instance[1].substring(0, instance[1].indexOf('('))) {
+          case 'hidden':
+            instanceTag = 'friends+'
+            break
+          case 'friends':
+            instanceTag = 'friends'
+            break
+        }
       }
     }
     embed.setDescription(`Status: ${user.status}/${user.statusDescription}`)
