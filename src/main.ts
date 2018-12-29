@@ -11,7 +11,7 @@ async function fetchStatus(api: VrcApi): Promise<UserResponse[]> {
     autoload: true,
   })
 
-  const userIds: {vrchatId: string}[] = await db.find({}, {"vrchatId": true})
+  const userIds: {vrchatId: string}[] = await db.find({})
   return await Promise.all(userIds.map(v => api.user.getById(v.vrchatId)))
 }
 
@@ -48,6 +48,7 @@ async function createEmbed(user: UserResponse, api: VrcApi): Promise<RichEmbed> 
 async function sendStatusMessage(api: VrcApi, channel: TextChannel): Promise<(Message | Message[])[]> {
   const users = await fetchStatus(api)
   const embeds = await Promise.all(users.map(v => createEmbed(v, api)))
+  await channel.messages.deleteAll()
   return await Promise.all(embeds.map(v => channel.send(v)))
 }
 
