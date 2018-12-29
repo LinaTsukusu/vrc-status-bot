@@ -8,7 +8,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-
+    "start": "node dist/main.js",
+    "build": "node_modules/.bin/tsc"
   },
   "dependencies": {
     "discord.js": "^11.4.2",
