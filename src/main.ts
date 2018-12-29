@@ -1,5 +1,5 @@
 import vrc from 'vrchat-client'
-import datastore from 'nedb-promise'
+import {datastore} from 'nedb-promise'
 import {Client, Message, RichEmbed, TextChannel} from 'discord.js'
 import VrcApi from 'vrchat-client/dist/vrc-api'
 import {UserResponse} from 'vrchat-client/dist/types/user'
