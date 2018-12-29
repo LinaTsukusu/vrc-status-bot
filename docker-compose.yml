@@ -12,4 +12,4 @@ services:
       - .:/app
       - ./db:/db
     working_dir: /app
-    entrypoint: bash -c "yarn && yarn start"
+    entrypoint: bash -c "yarn && yarn build && yarn start"
