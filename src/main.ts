@@ -25,6 +25,7 @@ async function createEmbed(userObj: {user: UserResponse, chatId: string, _id: st
     let instanceTag = 'public'
     if (user.worldId === 'private') {
       embed.setDescription(`Status: Private`)
+        .setColor(0xff9344)
     } else {
       const worldInfo = await api.world.getById(user.worldId)
       const instance = user.instanceId.split('~')
