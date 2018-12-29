@@ -41,6 +41,7 @@ async function createEmbed(userObj: {user: UserResponse, chatId: string, _id: st
       embed.setDescription(`Status: ${user.status}/${user.statusDescription}`)
         .setTitle(`${worldInfo.name} - ${instanceTag}`)
         .setThumbnail(worldInfo.imageUrl)
+        .setColor(0x00ff40)
     }
   }
   return {embed: embed, chatId: userObj.chatId, _id: userObj._id}
