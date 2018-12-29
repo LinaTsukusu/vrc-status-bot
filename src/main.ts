@@ -5,14 +5,14 @@ import VrcApi from 'vrchat-client/dist/vrc-api'
 import {UserResponse} from 'vrchat-client/dist/types/user'
 
 
-async function fetchStatus(api: VrcApi): Promise<any> {
+async function fetchStatus(api: VrcApi): Promise<{user: UserResponse, chatId: string}[]> {
   const db = datastore({
     filename: '/db/users.db',
     autoload: true,
   })
 
-  const users = await db.find({})
-  return await Promise.all(users.map(async v => {return {user: await api.user.getById(v.vrchatId), chat: v.chatId}}))
+  const users: {vrchatId: string, chatId: string}[] = await db.find({})
+  return await Promise.all(users.map(async v => {return {user: await api.user.getById(v.vrchatId), chatId: v.chatId}}))
 }
 
 async function createEmbed(user: UserResponse, chatId: string, api: VrcApi): Promise<{embed: RichEmbed, chatId: string}> {
@@ -48,7 +48,7 @@ async function createEmbed(user: UserResponse, chatId: string, api: VrcApi): Pro
 async function sendStatusMessage(api: VrcApi, channel: TextChannel) {
   const users = await fetchStatus(api)
   console.log(users)
-  const embeds: any = await Promise.all(users.map(v => createEmbed(v.vrchatId, v.chatId, api)))
+  const embeds: any = await Promise.all(users.map(v => createEmbed(v.user, v.chatId, api)))
   console.log(embeds)
   // Promise.all(embeds.map(async v => {
   //   channel.send(v.embed)
