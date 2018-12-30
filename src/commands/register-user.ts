@@ -6,22 +6,21 @@ import {datastore} from 'nedb-promise'
 
 export async function registerUser(message: Message, api: VrcApi) {
   const channel = message.channel
-  const command = message.content.split(" ")
-  if (message.author.bot || channel.id !== process.env.SETTING_CHANNEL_ID || command.shift() !== "/register") {
+  if (message.author.bot || channel.id !== process.env.SETTING_CHANNEL_ID || !message.content.startsWith("/register")) {
     return
   }
-  const mentionUsers = message.mentions.users
-  if (command.length == 1 && mentionUsers.size != 0 || command.length == 2 && mentionUsers.size != 1) {
+  const command = message.content.match(/\/register\s+<@\d+>\s+['"]?([^'"]+)['"]?/)
+
+  if (!command) {
     channel.send('コマンド間違っとるで')
   }
 
   let discordId = message.author.id
   if (message.mentions.users.size > 0) {
     discordId = message.mentions.users.first().id
-    command.shift()
   }
 
-  const vrc = command.shift()
+  const vrc = command[1]
   let user: UserResponse = null
   try {
     user = await api.user.getById(vrc)
