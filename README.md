@@ -39,8 +39,6 @@ docker-compose up -d
 
 ## TODO
 - `vrchat-client`をログイン以外の方法作ったほうがいいかも
-- ユーザ登録で空白ありのUsernameだと使えない
-  - というかUsernameで登録するのたまにバグる
 - ユーザ管理をutilみたいに切り分けて置きたい
   - 今後メッセージ送信とか作りたいので
  

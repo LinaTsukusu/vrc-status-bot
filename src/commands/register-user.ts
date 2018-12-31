@@ -9,7 +9,7 @@ export async function registerUser(message: Message, api: VrcApi) {
   if (message.author.bot || channel.id !== process.env.SETTING_CHANNEL_ID || !message.content.startsWith("/register")) {
     return
   }
-  const command = message.content.match(/\/register\s+<@\d+>\s+['"]?([^'"]+)['"]?/)
+  const command = message.content.match(/\/register(\s+<@\d+>)?\s+['"]?([^'"]+)['"]?/)
 
   if (!command) {
     channel.send('コマンド間違っとるで')
@@ -20,7 +20,7 @@ export async function registerUser(message: Message, api: VrcApi) {
     discordId = message.mentions.users.first().id
   }
 
-  const vrc = command[1]
+  const vrc = command[2]
   let user: UserResponse = null
   try {
     user = await api.user.getById(vrc)
