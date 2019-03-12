@@ -11,6 +11,9 @@ import {sendStatusMessage} from './send-message'
   await client.login(process.env.TOKEN)
   const channel = (<TextChannel>client.channels.get(process.env.CHANNEL_ID))
   const api = await vrc.login(process.env.VRC_USERNAME, process.env.VRC_PASSWORD)
+
+  sendStatusMessage(api, channel)
+  console.log(`updated at ${new Date().toTimeString()}`)
   setInterval(() => {
     sendStatusMessage(api, channel)
     console.log(`updated at ${new Date().toTimeString()}`)
