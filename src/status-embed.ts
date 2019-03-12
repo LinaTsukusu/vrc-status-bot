@@ -1,12 +1,12 @@
 import {UserResponse} from 'vrchat-client/dist/types/user'
 import VrcApi from 'vrchat-client/dist/vrc-api'
-import {RichEmbed} from "discord.js"
+import {RichEmbed} from 'discord.js'
 
-export async function createEmbed(userObj: {user: UserResponse, chatId: string, _id: string}, api: VrcApi): Promise<{embed: RichEmbed, chatId: string, _id: string}> {
+export async function createEmbed(userObj: { user: UserResponse, chatId: string, _id: string }, api: VrcApi): Promise<{ embed: RichEmbed, chatId: string, _id: string }> {
   const user = userObj.user
   const embed = new RichEmbed()
     .setAuthor(user.displayName, user.currentAvatarThumbnailImageUrl, `https://vrchat.net/home/user/${user.id}`)
-  if (user.location === 'offline') {
+  if (user.location === 'offline' || user.location === '') {
     embed.setDescription(`Status: Offline`)
   } else {
     let instanceTag = 'public'

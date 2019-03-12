@@ -6,13 +6,14 @@ import {datastore} from 'nedb-promise'
 
 export async function registerUser(message: Message, api: VrcApi) {
   const channel = message.channel
-  if (message.author.bot || channel.id !== process.env.SETTING_CHANNEL_ID || !message.content.startsWith("/register")) {
+  if (message.author.bot || channel.id !== process.env.SETTING_CHANNEL_ID || !message.content.startsWith('/register')) {
     return
   }
   const command = message.content.match(/\/register(\s+<@\d+>)?\s+['"]?([^'"]+)['"]?/)
 
   if (!command) {
     channel.send('コマンド間違っとるで')
+    return
   }
 
   let discordId = message.author.id
@@ -29,7 +30,13 @@ export async function registerUser(message: Message, api: VrcApi) {
       user = await api.user.getByName(vrc)
     } catch (e) {
       channel.send('名前でもIDでもないっぽいぞ')
+      return
     }
+  }
+
+  if (!user.isFriend) {
+    channel.send(`${process.env.VRC_USERNAME}とフレンドじゃないみたい\nフレンド送っておくから確認してな`)
+    await api.user.sendFriendRequest(user.id)
   }
 
   const db = datastore({
@@ -38,7 +45,7 @@ export async function registerUser(message: Message, api: VrcApi) {
   })
   const checkId = await db.count({discordId: discordId})
   if (checkId > 0) {
-    channel.send("なんかもう登録されてるで｡消すときは`/remove [mention]`してな｡")
+    channel.send('なんかもう登録されてるで｡消すときは`/remove [mention]`してな｡')
     return
   }
   db.insert({vrchatId: user.id, discordId: discordId})
